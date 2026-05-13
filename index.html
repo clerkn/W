@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gift Card Shop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:Arial;background:#0a0a2a;color:#fff;padding:20px}
+        .card{max-width:450px;margin:auto;background:rgba(255,255,255,0.1);padding:25px;border-radius:20px;border:1px solid #00ff88;text-align:center}
+        h2{color:#00ff88;margin-bottom:20px}
+        input,button{width:100%;padding:12px;margin:10px 0;border-radius:10px;border:none}
+        input{background:#1a1a3a;border:1px solid #00ff88;color:#fff}
+        button{background:#00ff88;color:#000;font-weight:bold;cursor:pointer}
+        .product{background:#1a1a3a;padding:15px;margin:10px 0;border-radius:10px;display:flex;justify-content:space-between;cursor:pointer}
+        .hidden{display:none}
+        .telegram-btn{display:inline-block;background:#08c;padding:12px 20px;border-radius:25px;text-decoration:none;color:#fff;margin:15px 0}
+    </style>
+</head>
+<body>
+<div class="card" id="app">
+    <h2>🔐 GIFT CARD SHOP</h2>
+    <div id="msg" style="color:#0f0;margin:10px 0"></div>
+    <input type="tel" id="phone" placeholder="Phone Number">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button onclick="showRegister()" style="background:#333;color:#fff">New User? Register</button>
+</div>
+
+<script>
+    // Config
+    const BOT_TOKEN = "8674826347:AAHLN8nGRz7pVN1Vh9AdjnAbCoQ5R5n8dCk";
+    const OWNER_ID = "8558052873";
+    const BOT_USERNAME = "giftclerkbot";
+    
+    let currentUser = null;
+    let cart = [];
+
+    function saveUser(user){
+        let users = JSON.parse(localStorage.getItem('users') || '{}');
+        users[user.phone] = user;
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+    
+    function getUsers(){
+        return JSON.parse(localStorage.getItem('users') || '{}');
+    }
+
+    function showMessage(msg){
+        let m = document.getElementById('msg');
+        if(m) { m.innerText = msg; setTimeout(()=>{ m.innerText = ''; },3000); }
+        else alert(msg);
+    }
+
+    function showRegister(){
+        document.getElementById('app').innerHTML = `
+            <h2>📝 REGISTER</h2>
+            <div id="msg" style="color:#0f0"></div>
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="tel" id="regPhone" placeholder="Phone Number">
+            <input type="password" id="regPassword" placeholder="Password">
+            <button onclick="register()">Register</button>
+            <button onclick="showLogin()" style="background:#333">Back to Login</button>
+        `;
+    }
+
+    function showLogin(){
+        document.getElementById('app').innerHTML = `
+            <h2>🔐 GIFT CARD SHOP</h2>
+            <div id="msg" style="color:#0f0"></div>
+            <input type="tel" id="phone" placeholder="Phone Number">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <button onclick="showRegister()" style="background:#333">New User? Register</button>
+        `;
+    }
+
+    function showVerify(){
+        document.getElementById('app').innerHTML = `
+            <h2>🤖 VERIFY TELEGRAM</h2>
+            <div id="msg" style="color:#0f0"></div>
+            <a href="tg://resolve?domain=${BOT_USERNAME}" target="_blank" class="telegram-btn">📱 Open @${BOT_USERNAME}</a>
+            <p>Send <strong>/start</strong> to the bot</p>
+            <input type="text" id="code" placeholder="Paste code from bot">
+            <button onclick="verify()">Verify</button>
+        `;
+    }
+
+    function showShop(){
+        const products = [
+            {n:"Amazon ₹100", v:100, p:50},{n:"Amazon ₹200", v:200, p:100},
+            {n:"Amazon ₹500", v:500, p:250},{n:"Amazon ₹1000", v:1000, p:499},
+            {n:"Flipkart ₹100", v:100, p:50},{n:"Flipkart ₹200", v:200, p:100},
+            {n:"Google Play ₹100", v:100, p:50},{n:"Telegram Premium", v:499, p:250},
+            {n:"Tashan Win", v:100, p:50},{n:"DM Win", v:100, p:50}
+        ];
+        let html = `<h2>🛍️ Welcome ${currentUser.name}</h2><div id="msg" style="color:#0f0"></div>`;
+        products.forEach(p => {
+            html += `<div class="product" onclick="addToCart('${p.n}',${p.v},${p.p})"><span>${p.n}</span><span style="color:#0f0">₹${p.p}</span></div>`;
+        });
+        html += `<button onclick="viewCart()">🛒 Cart (${cart.length})</button>
+                 <button onclick="logout()" style="background:#f44">Logout</button>
+                 <div id="cartModal" style="margin-top:20px"></div>
+                 <div id="payModal"></div>`;
+        document.getElementById('app').innerHTML = html;
+    }
+
+    function addToCart(n,v,p){
+        if(!currentUser){ showMessage("Login first"); return; }
+        cart.push({n,v,p});
+        showMessage("Added to cart!");
+    }
+
+    function viewCart(){
+        if(cart.length===0){ showMessage("Cart empty"); return; }
+        let total = 0, items = "";
+        cart.forEach((item,i)=>{
+            total += item.p;
+            items += `<div style="display:flex;justify-content:space-between;margin:5px 0"><span>${item.n}</span><span>₹${item.p}</span><button onclick="removeItem(${i})" style="width:auto;background:#f44">X</button></div>`;
+        });
+        document.getElementById('cartModal').innerHTML = `<div class="card"><h3>Your Cart</h3>${items}<hr><strong>Total: ₹${total}</strong><br><button onclick="checkout(${total})">Checkout</button><button onclick="closeCart()" style="background:#333">Close</button></div>`;
+    }
+
+    function removeItem(i){ cart.splice(i,1); viewCart(); }
+    function closeCart(){ document.getElementById('cartModal').innerHTML = ""; }
+
+    function checkout(total){
+        closeCart();
+        const upi = `upi://pay?pa=ninadxclerk@fam&am=${total}&cu=INR`;
+        const qr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upi)}`;
+        document.getElementById('payModal').innerHTML = `<div class="card"><h3>💳 PAYMENT</h3><img src="${qr}" style="width:180px;margin:10px auto;display:block"><p>UPI: <strong>ninadxclerk@fam</strong></p><input type="text" id="utr" placeholder="Enter UTR"><button onclick="submitPay(${total})">Submit</button><button onclick="closePay()" style="background:#333">Cancel</button></div>`;
+    }
+
+    function closePay(){ document.getElementById('payModal').innerHTML = ""; }
+
+    function submitPay(total){
+        let utr = document.getElementById('utr').value;
+        if(!utr){ showMessage("Enter UTR"); return; }
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({chat_id:OWNER_ID,text:`🆕 ORDER!\nUser: ${currentUser.name}\nPhone: ${currentUser.phone}\nTG ID: ${currentUser.telegramId}\nItems: ${cart.length}\nTotal: ₹${total}\nUTR: ${utr}`})
+        });
+        let orders = JSON.parse(localStorage.getItem(`orders_${currentUser.phone}`) || '[]');
+        orders.push({items:cart,total,utr,date:new Date().toISOString()});
+        localStorage.setItem(`orders_${currentUser.phone}`, JSON.stringify(orders));
+        showMessage("Order placed! You will receive gift card within 24 hours.");
+        cart = [];
+        closePay();
+        showShop();
+    }
+
+    function register(){
+        let name = document.getElementById('name').value;
+        let phone = document.getElementById('regPhone').value;
+        let pwd = document.getElementById('regPassword').value;
+        if(!name||!phone||!pwd){ showMessage("Fill all"); return; }
+        let users = getUsers();
+        if(users[phone]){ showMessage("Phone exists"); return; }
+        saveUser({name,phone,password:pwd,telegramId:null});
+        showMessage("Registered! Please login.");
+        showLogin();
+    }
+
+    function login(){
+        let phone = document.getElementById('phone').value;
+        let pwd = document.getElementById('password').value;
+        let users = getUsers();
+        let user = users[phone];
+        if(user && user.password === pwd){
+            currentUser = user;
+            if(!user.telegramId) showVerify();
+            else showShop();
+        } else { showMessage("Invalid"); }
+    }
+
+    function verify(){
+        let code = document.getElementById('code').value;
+        if(!code){ showMessage("Enter code"); return; }
+        currentUser.telegramId = code;
+        let users = getUsers();
+        users[currentUser.phone].telegramId = code;
+        localStorage.setItem('users', JSON.stringify(users));
+        showMessage("Verified!");
+        showShop();
+    }
+
+    function logout(){ currentUser = null; cart = []; showLogin(); }
+</script>
+</body>
+</html>
