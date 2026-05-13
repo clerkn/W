@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiftCardHub</title>
+    <title>GiftCardHub | Premium Gift Cards</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#333;}
-        .header{background:#1a1a2e;color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+        .header{background:#1a1a2e;color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;}
         .logo{font-size:24px;font-weight:bold;color:#00ff88;}
         .cart-icon{position:relative;cursor:pointer;font-size:24px;}
         .cart-count{position:absolute;top:-8px;right:-12px;background:#ff4444;color:#fff;font-size:12px;padding:2px 6px;border-radius:50%;}
-        button{background:#00ff88;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;}
+        button{background:#00ff88;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;transition:0.2s;}
+        button:hover{transform:scale(1.02);}
         .container{max-width:1200px;margin:0 auto;padding:20px;}
         .hero{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:60px 20px;text-align:center;border-radius:20px;margin-bottom:30px;}
         .hero h1{font-size:48px;margin-bottom:10px;}
         .hero .offer{font-size:32px;margin:20px 0;color:#00ff88;}
         .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
-        .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.2s;}
-        .card:hover{transform:translateY(-4px);}
+        .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
+        .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.15);}
         .card-img{height:150px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:64px;}
         .card-info{padding:16px;text-align:center;}
         .card-title{font-size:18px;font-weight:bold;margin-bottom:5px;}
         .card-price{color:#00aa44;font-size:20px;font-weight:bold;margin:10px 0;}
-        .old-price{font-size:14px;color:#999;text-decoration:line-through;margin-left:5px;}
         .badge{background:#ff4444;color:#fff;padding:5px 10px;border-radius:20px;font-size:12px;display:inline-block;}
+        .custom-card{background:linear-gradient(135deg,#1a1a3a,#2a2a4a);color:#fff;}
+        .custom-card .card-title{color:#00ff88;}
+        .custom-card input{width:100%;padding:10px;margin:10px 0;background:#fff;border:none;border-radius:8px;font-size:16px;}
         .sidebar{position:fixed;right:-400px;top:0;width:100%;max-width:400px;height:100%;background:#fff;box-shadow:-2px 0 10px rgba(0,0,0,0.1);transition:right 0.3s;z-index:1000;display:flex;flex-direction:column;}
         .sidebar.active{right:0;}
         .sidebar-header{background:#1a1a2e;color:#fff;padding:20px;display:flex;justify-content:space-between;}
@@ -38,8 +41,11 @@
         .modal-card input{width:100%;padding:12px;margin:10px 0;background:#2a2a4a;border:1px solid #00ff88;border-radius:8px;color:#fff;}
         .modal-card button{width:100%;margin-top:10px;}
         .qr-img{width:200px;margin:15px auto;display:block;background:#fff;padding:10px;border-radius:16px;}
-        .hidden{display:none;}
+        .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#00aa44;color:#fff;padding:12px 24px;border-radius:8px;z-index:2000;animation:fadeIn 0.3s;}
+        @keyframes fadeIn{from{opacity:0;bottom:0;}to{opacity:1;bottom:20px;}}
         @media(max-width:768px){.hero h1{font-size:32px;}}
+        .flex{display:flex;gap:10px;}
+        .w-100{width:100%;}
     </style>
 </head>
 <body>
@@ -56,7 +62,7 @@
 <div class="container" id="mainContent">
     <div class="hero">
         <h1>Premium Gift Cards</h1>
-        <p>Up to 50% OFF on all brands</p>
+        <p>Any amount. Any brand. 50% OFF.</p>
         <div class="offer">🔥 50% SAVINGS 🔥</div>
         <button onclick="scrollToProducts()">Shop Now →</button>
     </div>
@@ -72,7 +78,7 @@
 
 <div class="modal" id="loginModal"><div class="modal-card"><h2>🔐 Login</h2><div id="loginMsg" style="color:#00ff88"></div><input type="tel" id="loginPhone" placeholder="Phone Number"><input type="password" id="loginPassword" placeholder="Password"><button onclick="login()">Login</button><button onclick="showRegister()" style="background:#333">Register</button></div></div>
 <div class="modal" id="registerModal"><div class="modal-card"><h2>📝 Register</h2><input type="text" id="regName" placeholder="Full Name"><input type="tel" id="regPhone" placeholder="Phone Number"><input type="password" id="regPassword" placeholder="Password"><button onclick="register()">Register</button><button onclick="closeRegister()" style="background:#333">Back</button></div></div>
-<div class="modal" id="deliveryModal"><div class="modal-card"><h3>📬 Delivery</h3><button onclick="showEmail()" style="background:#0088cc">📧 Email</button><button onclick="showTelegram()" style="background:#0088cc;margin-top:10px;">📱 Telegram</button><button onclick="closeDelivery()" style="background:#333">Back</button></div></div>
+<div class="modal" id="deliveryModal"><div class="modal-card"><h3>📬 Choose Delivery</h3><button onclick="showEmail()" style="background:#0088cc">📧 Email</button><button onclick="showTelegram()" style="background:#0088cc;margin-top:10px;">📱 Telegram</button><button onclick="closeDelivery()" style="background:#333">Back</button></div></div>
 <div class="modal" id="emailModal"><div class="modal-card"><h3>📧 Your Email</h3><input type="email" id="userEmail" placeholder="Enter email"><button onclick="saveEmail()">Continue</button><button onclick="backToDelivery()" style="background:#333">Back</button></div></div>
 <div class="modal" id="telegramModal"><div class="modal-card"><h3>📱 Telegram ID</h3><input type="text" id="userTelegram" placeholder="@username or ID"><button onclick="saveTelegram()">Continue</button><button onclick="backToDelivery()" style="background:#333">Back</button></div></div>
 <div class="modal" id="paymentModal"><div class="modal-card"><h3>💳 Pay via UPI</h3><img id="qrImg" class="qr-img"><p>UPI: <strong>ninadxclerk@fam</strong></p><input type="text" id="utr" placeholder="Enter UTR"><button onclick="submitOrder()">Submit</button><button onclick="closePayment()" style="background:#333">Cancel</button></div></div>
@@ -86,44 +92,145 @@ let cart = [];
 let deliveryType = null;
 let deliveryValue = null;
 
-const products = [
-    {id:1,name:"Amazon",value:100,price:50,icon:"🛍️"},
-    {id:2,name:"Amazon",value:200,price:100,icon:"🛍️"},
-    {id:3,name:"Amazon",value:500,price:250,icon:"🛍️"},
-    {id:4,name:"Amazon",value:1000,price:499,icon:"🛍️"},
-    {id:5,name:"Flipkart",value:100,price:50,icon:"📦"},
-    {id:6,name:"Flipkart",value:200,price:100,icon:"📦"},
-    {id:7,name:"Flipkart",value:500,price:250,icon:"📦"},
-    {id:8,name:"Google Play",value:100,price:50,icon:"🎮"},
-    {id:9,name:"Google Play",value:200,price:100,icon:"🎮"},
-    {id:10,name:"Telegram Premium",value:499,price:250,icon:"✈️"},
-    {id:11,name:"Tashan Win",value:100,price:50,icon:"🎰"},
-    {id:12,name:"DM Win",value:100,price:50,icon:"🎲"},
-    {id:13,name:"Jai Club",value:100,price:50,icon:"👑"},
-    {id:14,name:"Myntra",value:500,price:250,icon:"👕"},
-    {id:15,name:"OLA",value:200,price:100,icon:"🚕"}
+const brands = [
+    {id:1,name:"Amazon",icon:"🛍️",color:"#ff9900"},
+    {id:2,name:"Flipkart",icon:"📦",color:"#2874f0"},
+    {id:3,name:"Google Play",icon:"🎮",color:"#34a853"},
+    {id:4,name:"Telegram Premium",icon:"✈️",color:"#0088cc"},
+    {id:5,name:"Tashan Win",icon:"🎰",color:"#ff4444"},
+    {id:6,name:"DM Win",icon:"🎲",color:"#aa44ff"},
+    {id:7,name:"Jai Club",icon:"👑",color:"#ffaa00"},
+    {id:8,name:"Myntra",icon:"👕",color:"#ff3f6e"},
+    {id:9,name:"OLA",icon:"🚕",color:"#00aa44"},
+    {id:10,name:"Croma",icon:"💻",color:"#cc0000"},
+    {id:11,name:"Bata",icon:"👟",color:"#cc0000"},
+    {id:12,name:"Zee TV",icon:"📺",color:"#0066cc"},
+    {id:13,name:"Pantaloons",icon:"👗",color:"#ff69b4"},
+    {id:14,name:"Lifestyle",icon:"🛍️",color:"#ff6600"},
+    {id:15,name:"Liberty",icon:"👞",color:"#0066cc"}
 ];
+
+function calculatePrice(amount){
+    let price = Math.ceil(amount / 2);
+    if(price < 25) price = 25;
+    return price;
+}
 
 function renderProducts(){
     const grid = document.getElementById('productsGrid');
-    grid.innerHTML = products.map(p => `
-        <div class="card" onclick="addToCart(${p.id})">
-            <div class="card-img">${p.icon}</div>
+    let html = '';
+    brands.forEach(brand => {
+        html += `
+            <div class="card" onclick="showAmountModal('${brand.name}','${brand.icon}')">
+                <div class="card-img">${brand.icon}</div>
+                <div class="card-info">
+                    <div class="card-title">${brand.name}</div>
+                    <div class="badge">50% OFF</div>
+                    <div class="card-price">Custom Amount</div>
+                    <div style="font-size:12px;color:#666;">Click to enter amount</div>
+                </div>
+            </div>
+        `;
+    });
+    html += `
+        <div class="card custom-card" onclick="showCustomBrandModal()">
+            <div class="card-img">🎁</div>
             <div class="card-info">
-                <div class="card-title">${p.name} - ₹${p.value}</div>
+                <div class="card-title">Custom Brand</div>
                 <div class="badge">50% OFF</div>
-                <div class="card-price">Pay ₹${p.price}<span class="old-price">₹${p.value}</span></div>
+                <div class="card-price">Any Brand You Want</div>
+                <div style="font-size:12px;">Tell us your brand</div>
             </div>
         </div>
-    `).join('');
+    `;
+    grid.innerHTML = html;
 }
 
-function addToCart(id){
-    if(!currentUser){ showLogin(); return; }
-    const p = products.find(p=>p.id===id);
-    cart.push(p);
+function showAmountModal(brandName, icon){
+    document.getElementById('paymentModal').innerHTML = `
+        <div class="modal-card">
+            <h3>💰 ${brandName} ${icon}</h3>
+            <p>50% OFF - You pay 50% of amount</p>
+            <input type="number" id="customAmount" placeholder="Enter gift card amount (Min ₹50)" min="50">
+            <p style="font-size:12px;color:#00ff88;margin:5px 0">You will pay: ₹<span id="pricePreview">25</span></p>
+            <button onclick="addCustomAmountToCart('${brandName}','${icon}')">Add to Cart</button>
+            <button onclick="closePayment()" style="background:#333">Cancel</button>
+        </div>
+    `;
+    document.getElementById('paymentModal').classList.add('active');
+    
+    const amountInput = document.getElementById('customAmount');
+    const pricePreview = document.getElementById('pricePreview');
+    amountInput.addEventListener('input', function(){
+        let val = parseInt(this.value) || 0;
+        if(val < 50) val = 50;
+        pricePreview.innerText = calculatePrice(val);
+    });
+}
+
+function showCustomBrandModal(){
+    document.getElementById('paymentModal').innerHTML = `
+        <div class="modal-card">
+            <h3>🎁 Custom Brand</h3>
+            <input type="text" id="customBrand" placeholder="Enter brand name (e.g., Netflix, Spotify)">
+            <input type="number" id="customAmount" placeholder="Enter gift card amount (Min ₹50)" min="50">
+            <p style="font-size:12px;color:#00ff88;margin:5px 0">You will pay: ₹<span id="pricePreview">25</span></p>
+            <button onclick="addCustomBrandToCart()">Add to Cart</button>
+            <button onclick="closePayment()" style="background:#333">Cancel</button>
+        </div>
+    `;
+    document.getElementById('paymentModal').classList.add('active');
+    
+    const amountInput = document.getElementById('customAmount');
+    const pricePreview = document.getElementById('pricePreview');
+    amountInput.addEventListener('input', function(){
+        let val = parseInt(this.value) || 0;
+        if(val < 50) val = 50;
+        pricePreview.innerText = calculatePrice(val);
+    });
+}
+
+function addCustomAmountToCart(brandName, icon){
+    let amount = parseInt(document.getElementById('customAmount').value);
+    if(!amount || amount < 50){
+        alert("Minimum amount is ₹50");
+        return;
+    }
+    const price = calculatePrice(amount);
+    cart.push({
+        name: brandName,
+        icon: icon,
+        amount: amount,
+        price: price,
+        isCustom: false
+    });
     updateCartUI();
-    showToast("Added to cart!");
+    closePayment();
+    showToast(`Added ${brandName} ₹${amount} (Pay ₹${price})`);
+}
+
+function addCustomBrandToCart(){
+    let brand = document.getElementById('customBrand').value;
+    let amount = parseInt(document.getElementById('customAmount').value);
+    if(!brand){
+        alert("Enter brand name");
+        return;
+    }
+    if(!amount || amount < 50){
+        alert("Minimum amount is ₹50");
+        return;
+    }
+    const price = calculatePrice(amount);
+    cart.push({
+        name: brand,
+        icon: "🎁",
+        amount: amount,
+        price: price,
+        isCustom: true
+    });
+    updateCartUI();
+    closePayment();
+    showToast(`Added ${brand} ₹${amount} (Pay ₹${price})`);
 }
 
 function updateCartUI(){
@@ -134,7 +241,7 @@ function updateCartUI(){
     if(cart.length===0){ container.innerHTML = '<p style="text-align:center;color:#999;">Cart empty</p>'; return; }
     container.innerHTML = cart.map((item,i)=>`
         <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;">
-            <div><strong>${item.name}</strong><br>₹${item.value} → ₹${item.price}</div>
+            <div><strong>${item.name}</strong><br>₹${item.amount} → ₹${item.price}</div>
             <button onclick="removeFromCart(${i})" style="background:#ff4444;padding:5px 10px;">Remove</button>
         </div>
     `).join('');
@@ -169,13 +276,14 @@ function submitOrder(){
     let utr = document.getElementById('utr').value;
     if(!utr){ alert("Enter UTR"); return; }
     const total = cart.reduce((s,i)=>s+i.price,0);
-    const items = cart.map(i=>`${i.name} ₹${i.value}`).join(", ");
+    const items = cart.map(i=>`${i.name} ₹${i.amount} → ₹${i.price}`).join("\n");
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:OWNER_ID,text:`🆕 NEW ORDER!\nUser: ${currentUser.name}\nPhone: ${currentUser.phone}\nItems: ${items}\nTotal: ₹${total}\nDelivery: ${deliveryType} → ${deliveryValue}\nUTR: ${utr}`})
+        body:JSON.stringify({chat_id:OWNER_ID,text:`🆕 NEW ORDER!\n\nUser: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n📦 ITEMS:\n${items}\n\n💰 Total: ₹${total}\n📬 Delivery: ${deliveryType} → ${deliveryValue}\n💳 UTR: ${utr}\n\n⏰ ${new Date().toLocaleString()}`})
     });
     alert("Order placed! Gift card will be sent within 24 hours.");
     cart = []; updateCartUI(); closePayment(); closeAllModals();
+    showToast("Order placed successfully!");
 }
 
 function showLogin(){ closeAllModals(); document.getElementById('loginModal').classList.add('active'); }
@@ -202,13 +310,13 @@ function login(){
         document.getElementById('userName').innerText=user.name;
         document.getElementById('loginBtn').innerText=user.name;
         closeLogin();
-    } else { alert("Invalid"); }
+        showToast(`Welcome ${user.name}!`);
+    } else { alert("Invalid phone or password"); }
 }
 function scrollToProducts(){ document.getElementById('productsGrid').scrollIntoView({behavior:'smooth'}); }
-function showToast(msg){ let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed';t.style.bottom='20px';t.style.left='50%';t.style.transform='translateX(-50%)';t.style.background='#00aa44';t.style.color='#fff';t.style.padding='10px 20px';t.style.borderRadius='8px';t.style.zIndex='2000'; document.body.appendChild(t); setTimeout(()=>t.remove(),2000); }
+function showToast(msg){ let t=document.createElement('div'); t.className='toast'; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
 
 renderProducts();
-if(localStorage.getItem('users')){} // init
 </script>
 </body>
 </html>
