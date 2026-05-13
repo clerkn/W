@@ -1,6 +1,6 @@
 import http from 'http';
 
-const BOT_TOKEN = "8674826347:AAHLN8nGRz7pVN1Vh9AdjnAbCoQ5R5n8dCk";
+const BOT_TOKEN = "8674826347:AAEuZgw8-gPqjFHT18EeNSo4WP9tgkET3aU";
 const OWNER_ID = "8558052873";
 
 let offset = 0;
@@ -26,32 +26,24 @@ async function poll() {
                     if (update.message && update.message.text === '/start') {
                         const chatId = update.message.chat.id;
                         const userId = update.message.from.id;
-                        const code = `USER_${userId}_${Date.now()}`;
-                        
                         await tg('sendMessage', {
                             chat_id: chatId,
-                            text: `✅ YOUR CODE: ${code}\n\nCopy this code and paste on website.`
+                            text: `✅ Welcome! Your Telegram ID is: ${userId}\n\nUse this ID when placing orders.`
                         });
-                        
                         await tg('sendMessage', {
                             chat_id: OWNER_ID,
-                            text: `🆕 New user!\nCode: ${code}\nUser ID: ${userId}`
+                            text: `🆕 New user: ${userId}`
                         });
                     }
-                    
-                    if (update.message && update.message.text && update.message.text.startsWith('/sendgc') && update.message.chat.id.toString() === OWNER_ID) {
+                    if (update.message && update.message.text && update.message.text.startsWith('/send') && update.message.chat.id.toString() === OWNER_ID) {
                         const parts = update.message.text.split(' ');
                         if (parts.length >= 3) {
-                            const targetCode = parts[1];
-                            const giftCode = parts.slice(2).join(' ');
-                            const match = targetCode.match(/USER_(\d+)_/);
-                            if (match) {
-                                await tg('sendMessage', {
-                                    chat_id: match[1],
-                                    text: `🎉 GIFT CARD!\n\nCode: ${giftCode}\n\nThank you for shopping!`
-                                });
-                                await tg('sendMessage', { chat_id: OWNER_ID, text: `✅ Sent to ${match[1]}` });
-                            }
+                            const target = parts[1];
+                            const code = parts.slice(2).join(' ');
+                            await tg('sendMessage', {
+                                chat_id: target,
+                                text: `🎉 GIFT CARD!\n\nCode: ${code}\n\nThank you for shopping!`
+                            });
                         }
                     }
                 }
