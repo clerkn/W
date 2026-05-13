@@ -3,26 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift Card Shop</title>
+    <title>GiftCardHub</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:Arial;background:linear-gradient(135deg,#0a0a2a,#0f0f3a);min-height:100vh;color:#fff;padding:20px;}
-        .container{max-width:500px;margin:0 auto;}
-        .card{background:rgba(255,255,255,0.1);border-radius:20px;padding:25px;margin-bottom:20px;border:1px solid #00ff88;text-align:center;}
-        h2{color:#00ff88;margin-bottom:20px;}
-        h3{color:#00ff88;margin:15px 0;}
-        input{width:100%;padding:12px;margin:10px 0;background:#1a1a3a;border:1px solid #00ff88;border-radius:10px;color:#fff;font-size:16px;box-sizing:border-box;}
-        button{width:100%;padding:12px;background:#00ff88;border:none;border-radius:10px;color:#0a0a2a;font-weight:bold;font-size:16px;cursor:pointer;margin-top:10px;}
-        button.secondary{background:#333;color:#fff;}
-        .product{background:#1a1a3a;padding:15px;margin:10px 0;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;}
-        .product-price{color:#00ff88;font-weight:bold;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#333;}
+        .header{background:#1a1a2e;color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+        .logo{font-size:24px;font-weight:bold;color:#00ff88;}
+        .cart-icon{position:relative;cursor:pointer;font-size:24px;}
+        .cart-count{position:absolute;top:-8px;right:-12px;background:#ff4444;color:#fff;font-size:12px;padding:2px 6px;border-radius:50%;}
+        button{background:#00ff88;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;}
+        .container{max-width:1200px;margin:0 auto;padding:20px;}
+        .hero{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:60px 20px;text-align:center;border-radius:20px;margin-bottom:30px;}
+        .hero h1{font-size:48px;margin-bottom:10px;}
+        .hero .offer{font-size:32px;margin:20px 0;color:#00ff88;}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+        .card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.2s;}
+        .card:hover{transform:translateY(-4px);}
+        .card-img{height:150px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:64px;}
+        .card-info{padding:16px;text-align:center;}
+        .card-title{font-size:18px;font-weight:bold;margin-bottom:5px;}
+        .card-price{color:#00aa44;font-size:20px;font-weight:bold;margin:10px 0;}
+        .old-price{font-size:14px;color:#999;text-decoration:line-through;margin-left:5px;}
+        .badge{background:#ff4444;color:#fff;padding:5px 10px;border-radius:20px;font-size:12px;display:inline-block;}
+        .sidebar{position:fixed;right:-400px;top:0;width:100%;max-width:400px;height:100%;background:#fff;box-shadow:-2px 0 10px rgba(0,0,0,0.1);transition:right 0.3s;z-index:1000;display:flex;flex-direction:column;}
+        .sidebar.active{right:0;}
+        .sidebar-header{background:#1a1a2e;color:#fff;padding:20px;display:flex;justify-content:space-between;}
+        .sidebar-items{flex:1;overflow:auto;padding:20px;}
+        .sidebar-footer{padding:20px;border-top:1px solid #eee;}
+        .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;display:none;}
+        .overlay.active{display:block;}
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1100;display:none;justify-content:center;align-items:center;}
+        .modal.active{display:flex;}
+        .modal-card{background:#1a1a3a;border-radius:20px;padding:30px;width:90%;max-width:400px;text-align:center;color:#fff;}
+        .modal-card input{width:100%;padding:12px;margin:10px 0;background:#2a2a4a;border:1px solid #00ff88;border-radius:8px;color:#fff;}
+        .modal-card button{width:100%;margin-top:10px;}
+        .qr-img{width:200px;margin:15px auto;display:block;background:#fff;padding:10px;border-radius:16px;}
         .hidden{display:none;}
-        .option-btn{background:#0088cc;margin:5px;width:48%;display:inline-block;}
-        .delivery-option{display:flex;gap:10px;margin:15px 0;}
+        @media(max-width:768px){.hero h1{font-size:32px;}}
     </style>
 </head>
 <body>
-<div class="container" id="app"></div>
+
+<div class="header">
+    <div class="logo">🎁 GiftCardHub</div>
+    <div>
+        <span id="userName" style="margin-right:15px;"></span>
+        <button id="loginBtn" onclick="showLogin()">Login</button>
+        <div class="cart-icon" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></div>
+    </div>
+</div>
+
+<div class="container" id="mainContent">
+    <div class="hero">
+        <h1>Premium Gift Cards</h1>
+        <p>Up to 50% OFF on all brands</p>
+        <div class="offer">🔥 50% SAVINGS 🔥</div>
+        <button onclick="scrollToProducts()">Shop Now →</button>
+    </div>
+    <div class="grid" id="productsGrid"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header"><h3>Your Cart</h3><span style="cursor:pointer" onclick="closeSidebar()">✕</span></div>
+    <div class="sidebar-items" id="cartItems"></div>
+    <div class="sidebar-footer"><div style="font-size:20px;margin-bottom:10px">Total: ₹<span id="cartTotal">0</span></div><button id="checkoutBtn" onclick="showDelivery()">Checkout</button></div>
+</div>
+
+<div class="modal" id="loginModal"><div class="modal-card"><h2>🔐 Login</h2><div id="loginMsg" style="color:#00ff88"></div><input type="tel" id="loginPhone" placeholder="Phone Number"><input type="password" id="loginPassword" placeholder="Password"><button onclick="login()">Login</button><button onclick="showRegister()" style="background:#333">Register</button></div></div>
+<div class="modal" id="registerModal"><div class="modal-card"><h2>📝 Register</h2><input type="text" id="regName" placeholder="Full Name"><input type="tel" id="regPhone" placeholder="Phone Number"><input type="password" id="regPassword" placeholder="Password"><button onclick="register()">Register</button><button onclick="closeRegister()" style="background:#333">Back</button></div></div>
+<div class="modal" id="deliveryModal"><div class="modal-card"><h3>📬 Delivery</h3><button onclick="showEmail()" style="background:#0088cc">📧 Email</button><button onclick="showTelegram()" style="background:#0088cc;margin-top:10px;">📱 Telegram</button><button onclick="closeDelivery()" style="background:#333">Back</button></div></div>
+<div class="modal" id="emailModal"><div class="modal-card"><h3>📧 Your Email</h3><input type="email" id="userEmail" placeholder="Enter email"><button onclick="saveEmail()">Continue</button><button onclick="backToDelivery()" style="background:#333">Back</button></div></div>
+<div class="modal" id="telegramModal"><div class="modal-card"><h3>📱 Telegram ID</h3><input type="text" id="userTelegram" placeholder="@username or ID"><button onclick="saveTelegram()">Continue</button><button onclick="backToDelivery()" style="background:#333">Back</button></div></div>
+<div class="modal" id="paymentModal"><div class="modal-card"><h3>💳 Pay via UPI</h3><img id="qrImg" class="qr-img"><p>UPI: <strong>ninadxclerk@fam</strong></p><input type="text" id="utr" placeholder="Enter UTR"><button onclick="submitOrder()">Submit</button><button onclick="closePayment()" style="background:#333">Cancel</button></div></div>
 
 <script>
 const BOT_TOKEN = "8674826347:AAEuZgw8-gPqjFHT18EeNSo4WP9tgkET3aU";
@@ -30,204 +83,132 @@ const OWNER_ID = "8558052873";
 
 let currentUser = null;
 let cart = [];
-let deliveryMethod = null;
+let deliveryType = null;
 let deliveryValue = null;
 
-function saveUser(user){
-    let users = JSON.parse(localStorage.getItem('users') || '{}');
-    users[user.phone] = user;
-    localStorage.setItem('users', JSON.stringify(users));
-}
+const products = [
+    {id:1,name:"Amazon",value:100,price:50,icon:"🛍️"},
+    {id:2,name:"Amazon",value:200,price:100,icon:"🛍️"},
+    {id:3,name:"Amazon",value:500,price:250,icon:"🛍️"},
+    {id:4,name:"Amazon",value:1000,price:499,icon:"🛍️"},
+    {id:5,name:"Flipkart",value:100,price:50,icon:"📦"},
+    {id:6,name:"Flipkart",value:200,price:100,icon:"📦"},
+    {id:7,name:"Flipkart",value:500,price:250,icon:"📦"},
+    {id:8,name:"Google Play",value:100,price:50,icon:"🎮"},
+    {id:9,name:"Google Play",value:200,price:100,icon:"🎮"},
+    {id:10,name:"Telegram Premium",value:499,price:250,icon:"✈️"},
+    {id:11,name:"Tashan Win",value:100,price:50,icon:"🎰"},
+    {id:12,name:"DM Win",value:100,price:50,icon:"🎲"},
+    {id:13,name:"Jai Club",value:100,price:50,icon:"👑"},
+    {id:14,name:"Myntra",value:500,price:250,icon:"👕"},
+    {id:15,name:"OLA",value:200,price:100,icon:"🚕"}
+];
 
-function getUsers(){
-    return JSON.parse(localStorage.getItem('users') || '{}');
-}
-
-function showMessage(msg){
-    let m = document.getElementById('msg');
-    if(m){ m.innerText = msg; setTimeout(()=>{ m.innerText = ''; },3000); }
-    else alert(msg);
-}
-
-function showLogin(){
-    document.getElementById('app').innerHTML = `
-        <div class="card">
-            <h2>🔐 GIFT CARD SHOP</h2>
-            <div id="msg" style="color:#00ff88;"></div>
-            <input type="tel" id="phone" placeholder="Phone Number">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="login()">Login</button>
-            <button onclick="showRegister()" class="secondary">New User? Register</button>
+function renderProducts(){
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = products.map(p => `
+        <div class="card" onclick="addToCart(${p.id})">
+            <div class="card-img">${p.icon}</div>
+            <div class="card-info">
+                <div class="card-title">${p.name} - ₹${p.value}</div>
+                <div class="badge">50% OFF</div>
+                <div class="card-price">Pay ₹${p.price}<span class="old-price">₹${p.value}</span></div>
+            </div>
         </div>
-    `;
+    `).join('');
 }
 
-function showRegister(){
-    document.getElementById('app').innerHTML = `
-        <div class="card">
-            <h2>📝 REGISTER</h2>
-            <div id="msg" style="color:#00ff88;"></div>
-            <input type="text" id="name" placeholder="Full Name">
-            <input type="tel" id="regPhone" placeholder="Phone Number">
-            <input type="password" id="regPassword" placeholder="Password">
-            <button onclick="register()">Register</button>
-            <button onclick="showLogin()" class="secondary">Back</button>
+function addToCart(id){
+    if(!currentUser){ showLogin(); return; }
+    const p = products.find(p=>p.id===id);
+    cart.push(p);
+    updateCartUI();
+    showToast("Added to cart!");
+}
+
+function updateCartUI(){
+    document.getElementById('cartCount').innerText = cart.length;
+    const total = cart.reduce((s,i)=>s+i.price,0);
+    document.getElementById('cartTotal').innerText = total;
+    const container = document.getElementById('cartItems');
+    if(cart.length===0){ container.innerHTML = '<p style="text-align:center;color:#999;">Cart empty</p>'; return; }
+    container.innerHTML = cart.map((item,i)=>`
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;">
+            <div><strong>${item.name}</strong><br>₹${item.value} → ₹${item.price}</div>
+            <button onclick="removeFromCart(${i})" style="background:#ff4444;padding:5px 10px;">Remove</button>
         </div>
-    `;
+    `).join('');
 }
 
-function showShop(){
-    const products = [
-        {n:"Amazon ₹100", p:50},{n:"Amazon ₹200", p:100},{n:"Amazon ₹500", p:250},{n:"Amazon ₹1000", p:499},
-        {n:"Flipkart ₹100", p:50},{n:"Flipkart ₹200", p:100},{n:"Flipkart ₹500", p:250},
-        {n:"Google Play ₹100", p:50},{n:"Telegram Premium", p:250},{n:"Tashan Win", p:50},{n:"DM Win", p:50},{n:"Jai Club", p:50}
-    ];
-    let html = `<div class="card"><h2>🛍️ Welcome ${currentUser.name}</h2><div id="msg" style="color:#00ff88;"></div>`;
-    products.forEach(p => {
-        html += `<div class="product" onclick="addToCart('${p.n}',${p.p})"><span>${p.n}</span><span class="product-price">₹${p.p}</span></div>`;
-    });
-    html += `<button onclick="viewCart()">🛒 Cart (${cart.length})</button>
-             <button onclick="logout()" class="secondary" style="background:#ff4444;">Logout</button></div>
-             <div id="cartModal" class="card hidden"></div>
-             <div id="deliveryModal" class="card hidden"></div>
-             <div id="payModal" class="card hidden"></div>`;
-    document.getElementById('app').innerHTML = html;
+function removeFromCart(i){ cart.splice(i,1); updateCartUI(); }
+function toggleCart(){ document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+
+function showDelivery(){
+    if(cart.length===0){ alert("Cart empty"); return; }
+    closeSidebar();
+    document.getElementById('deliveryModal').classList.add('active');
 }
+function showEmail(){ document.getElementById('deliveryModal').classList.remove('active'); document.getElementById('emailModal').classList.add('active'); }
+function showTelegram(){ document.getElementById('deliveryModal').classList.remove('active'); document.getElementById('telegramModal').classList.add('active'); }
+function saveEmail(){ let val=document.getElementById('userEmail').value; if(!val){alert("Enter email");return;} deliveryType="email"; deliveryValue=val; closeAllModals(); showPayment(); }
+function saveTelegram(){ let val=document.getElementById('userTelegram').value; if(!val){alert("Enter Telegram ID");return;} deliveryType="telegram"; deliveryValue=val; closeAllModals(); showPayment(); }
+function backToDelivery(){ closeAllModals(); document.getElementById('deliveryModal').classList.add('active'); }
+function closeDelivery(){ document.getElementById('deliveryModal').classList.remove('active'); }
+function closeAllModals(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active')); }
 
-function addToCart(n,p){
-    if(!currentUser){ showMessage("Login first"); return; }
-    cart.push({n,p});
-    showMessage("Added to cart!");
-}
-
-function viewCart(){
-    if(cart.length===0){ showMessage("Cart empty"); return; }
-    let total = 0, items = "";
-    cart.forEach((item,i)=>{
-        total += item.p;
-        items += `<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #333;"><span>${item.n}</span><span>₹${item.p}</span><button onclick="removeItem(${i})" style="width:auto;background:#ff4444;padding:5px 10px;">X</button></div>`;
-    });
-    document.getElementById('cartModal').innerHTML = `<h3>Your Cart</h3>${items}<hr><strong>Total: ₹${total}</strong><br><br><button onclick="showDeliveryOptions(${total})">Proceed to Delivery</button><button onclick="closeCart()" class="secondary">Close</button>`;
-    document.getElementById('cartModal').classList.remove('hidden');
-}
-
-function removeItem(i){ cart.splice(i,1); viewCart(); }
-function closeCart(){ document.getElementById('cartModal').classList.add('hidden'); }
-
-function showDeliveryOptions(total){
-    closeCart();
-    document.getElementById('deliveryModal').innerHTML = `
-        <h3>📬 Choose Delivery Method</h3>
-        <div class="delivery-option">
-            <button class="option-btn" onclick="showEmailForm(${total})">📧 Email</button>
-            <button class="option-btn" onclick="showTelegramForm(${total})">📱 Telegram</button>
-        </div>
-        <button onclick="closeDelivery()" class="secondary">Back</button>
-    `;
-    document.getElementById('deliveryModal').classList.remove('hidden');
-}
-
-function closeDelivery(){
-    document.getElementById('deliveryModal').classList.add('hidden');
-}
-
-function showEmailForm(total){
-    deliveryMethod = "email";
-    document.getElementById('deliveryModal').innerHTML = `
-        <h3>📧 Enter Your Email</h3>
-        <input type="email" id="deliveryValue" placeholder="Enter email address">
-        <button onclick="saveDeliveryAndProceed(${total})">Continue to Payment</button>
-        <button onclick="showDeliveryOptions(${total})" class="secondary">Back</button>
-    `;
-}
-
-function showTelegramForm(total){
-    deliveryMethod = "telegram";
-    document.getElementById('deliveryModal').innerHTML = `
-        <h3>📱 Enter Your Telegram ID</h3>
-        <input type="text" id="deliveryValue" placeholder="Enter Telegram ID (e.g., @username or 123456789)">
-        <button onclick="saveDeliveryAndProceed(${total})">Continue to Payment</button>
-        <button onclick="showDeliveryOptions(${total})" class="secondary">Back</button>
-    `;
-}
-
-function saveDeliveryAndProceed(total){
-    deliveryValue = document.getElementById('deliveryValue').value;
-    if(!deliveryValue){
-        alert("Please enter your " + (deliveryMethod === "email" ? "email" : "Telegram ID"));
-        return;
-    }
-    closeDelivery();
-    showPayment(total);
-}
-
-function showPayment(total){
+function showPayment(){
+    const total = cart.reduce((s,i)=>s+i.price,0);
     const upi = `upi://pay?pa=ninadxclerk@fam&am=${total}&cu=INR`;
-    const qr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upi)}`;
-    document.getElementById('payModal').innerHTML = `
-        <h3>💳 PAYMENT</h3>
-        <img src="${qr}" style="width:200px;margin:15px auto;display:block;">
-        <p>UPI: <strong>ninadxclerk@fam</strong></p>
-        <p>Total Amount: <strong style="color:#00ff88;">₹${total}</strong></p>
-        <input type="text" id="utr" placeholder="Enter UTR / Transaction ID">
-        <button onclick="submitPay(${total})">Submit Payment</button>
-        <button onclick="closePay()" class="secondary">Cancel</button>
-    `;
-    document.getElementById('payModal').classList.remove('hidden');
+    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upi)}`;
+    document.getElementById('paymentModal').classList.add('active');
 }
+function closePayment(){ document.getElementById('paymentModal').classList.remove('active'); }
 
-function closePay(){ document.getElementById('payModal').classList.add('hidden'); }
-
-function submitPay(total){
+function submitOrder(){
     let utr = document.getElementById('utr').value;
-    if(!utr){ showMessage("Enter UTR"); return; }
-    
-    let itemsList = cart.map(i => i.n).join(", ");
-    
+    if(!utr){ alert("Enter UTR"); return; }
+    const total = cart.reduce((s,i)=>s+i.price,0);
+    const items = cart.map(i=>`${i.name} ₹${i.value}`).join(", ");
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-            chat_id: OWNER_ID,
-            text: `🆕 NEW ORDER!\n\nUser: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n📦 Items: ${itemsList}\n💰 Total: ₹${total}\n📬 Delivery Method: ${deliveryMethod}\n📫 Delivery To: ${deliveryValue}\n💳 UTR: ${utr}\n\n⏰ Time: ${new Date().toLocaleString()}`
-        })
+        body:JSON.stringify({chat_id:OWNER_ID,text:`🆕 NEW ORDER!\nUser: ${currentUser.name}\nPhone: ${currentUser.phone}\nItems: ${items}\nTotal: ₹${total}\nDelivery: ${deliveryType} → ${deliveryValue}\nUTR: ${utr}`})
     });
-    
-    let orders = JSON.parse(localStorage.getItem(`orders_${currentUser.phone}`) || '[]');
-    orders.push({items:cart, total, utr, deliveryMethod, deliveryValue, date:new Date().toISOString()});
-    localStorage.setItem(`orders_${currentUser.phone}`, JSON.stringify(orders));
-    
-    showMessage("Order placed! Gift card will be sent to your " + deliveryMethod + " within 24 hours.");
-    cart = [];
-    closePay();
-    showShop();
+    alert("Order placed! Gift card will be sent within 24 hours.");
+    cart = []; updateCartUI(); closePayment(); closeAllModals();
 }
+
+function showLogin(){ closeAllModals(); document.getElementById('loginModal').classList.add('active'); }
+function closeLogin(){ document.getElementById('loginModal').classList.remove('active'); }
+function showRegister(){ closeLogin(); document.getElementById('registerModal').classList.add('active'); }
+function closeRegister(){ document.getElementById('registerModal').classList.remove('active'); }
 
 function register(){
-    let name = document.getElementById('name').value;
-    let phone = document.getElementById('regPhone').value;
-    let pwd = document.getElementById('regPassword').value;
-    if(!name||!phone||!pwd){ showMessage("Fill all"); return; }
-    let users = getUsers();
-    if(users[phone]){ showMessage("Phone exists"); return; }
-    saveUser({name, phone, password:pwd});
-    showMessage("Registered! Please login.");
-    showLogin();
+    let name=document.getElementById('regName').value, phone=document.getElementById('regPhone').value, pwd=document.getElementById('regPassword').value;
+    if(!name||!phone||!pwd){alert("Fill all");return;}
+    let users=JSON.parse(localStorage.getItem('users')||'{}');
+    if(users[phone]){alert("Phone exists");return;}
+    users[phone]={name,phone,password:pwd};
+    localStorage.setItem('users',JSON.stringify(users));
+    alert("Registered! Please login.");
+    closeRegister(); showLogin();
 }
-
 function login(){
-    let phone = document.getElementById('phone').value;
-    let pwd = document.getElementById('password').value;
-    let users = getUsers();
-    let user = users[phone];
-    if(user && user.password === pwd){
-        currentUser = user;
-        showShop();
-    } else { showMessage("Invalid phone or password"); }
+    let phone=document.getElementById('loginPhone').value, pwd=document.getElementById('loginPassword').value;
+    let users=JSON.parse(localStorage.getItem('users')||'{}');
+    let user=users[phone];
+    if(user && user.password===pwd){
+        currentUser=user;
+        document.getElementById('userName').innerText=user.name;
+        document.getElementById('loginBtn').innerText=user.name;
+        closeLogin();
+    } else { alert("Invalid"); }
 }
+function scrollToProducts(){ document.getElementById('productsGrid').scrollIntoView({behavior:'smooth'}); }
+function showToast(msg){ let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed';t.style.bottom='20px';t.style.left='50%';t.style.transform='translateX(-50%)';t.style.background='#00aa44';t.style.color='#fff';t.style.padding='10px 20px';t.style.borderRadius='8px';t.style.zIndex='2000'; document.body.appendChild(t); setTimeout(()=>t.remove(),2000); }
 
-function logout(){ currentUser = null; cart = []; showLogin(); }
-
-showLogin();
+renderProducts();
+if(localStorage.getItem('users')){} // init
 </script>
 </body>
 </html>
